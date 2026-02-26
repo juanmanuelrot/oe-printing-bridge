@@ -6,5 +6,8 @@
     "client",
     "react-lib",
     "example"
-  ]
+  ],
+  "scripts": {
+    "build:installer": "npm run build:installer -w bridge"
+  }
 }
