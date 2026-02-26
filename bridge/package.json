@@ -3,10 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "bin": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "package": "npm run build && npx @yao-pkg/pkg . --targets node20-win-x64 --output build/printer-bridge.exe --compress GZip",
+    "build:installer": "powershell -ExecutionPolicy Bypass -File scripts/build-installer.ps1"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/systray2/traybin/**/*",
+      "node_modules/@thiagoelg/node-printer/prebuilds/**/*",
+      "node_modules/@thiagoelg/node-printer/build/**/*"
+    ],
+    "outputPath": "build"
   },
   "dependencies": {
     "fastify": "^5.2.1",
@@ -23,6 +34,7 @@
     "typescript": "^5.7.3",
     "tsx": "^4.19.2",
     "@types/node": "^22.10.5",
-    "@types/ws": "^8.5.13"
+    "@types/ws": "^8.5.13",
+    "@yao-pkg/pkg": "^6.0.0"
   }
 }
