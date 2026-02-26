@@ -1,0 +1,10 @@
+{
+  "name": "printer-bridge-monorepo",
+  "private": true,
+  "workspaces": [
+    "bridge",
+    "client",
+    "react-lib",
+    "example"
+  ]
+}

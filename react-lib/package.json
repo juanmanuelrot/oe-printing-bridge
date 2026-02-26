@@ -1,0 +1,28 @@
+{
+  "name": "@printer-bridge/react",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@printer-bridge/client": "1.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "react": "^19.0.0",
+    "@types/react": "^19.0.0"
+  }
+}
