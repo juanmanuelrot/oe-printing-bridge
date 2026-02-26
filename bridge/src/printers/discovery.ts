@@ -12,8 +12,10 @@ let nodePrinter: {
 
 try {
   nodePrinter = (await import('@thiagoelg/node-printer')).default;
-} catch {
-  // Native module not available (e.g., development on macOS)
+  console.log('Native printer module loaded successfully');
+} catch (err) {
+  console.warn('Native printer module not available:', (err as Error).message);
+  console.warn('Falling back to mock printers');
 }
 
 export function mapPrinterStatus(rawStatus: string): PrinterStatus {

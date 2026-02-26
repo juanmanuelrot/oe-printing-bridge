@@ -12,8 +12,8 @@ let nodePrinter: {
 
 try {
   nodePrinter = (await import('@thiagoelg/node-printer')).default;
-} catch {
-  // Native module not available
+} catch (err) {
+  console.warn('Native printer module not available for printing:', (err as Error).message);
 }
 
 export function printRaw(printerName: string, data: Buffer): Promise<number> {
