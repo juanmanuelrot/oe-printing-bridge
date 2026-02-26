@@ -1,5 +1,4 @@
 import type { FastifyInstance } from 'fastify';
-import { isNativePrinterAvailable } from '../printers/discovery.js';
 
 export async function statusRoutes(app: FastifyInstance): Promise<void> {
   app.get('/status', async () => {
@@ -8,7 +7,6 @@ export async function statusRoutes(app: FastifyInstance): Promise<void> {
       version: '1.0.0',
       uptime: Math.floor(process.uptime()),
       queueLength: app.printQueue.getQueueLength(),
-      nativePrinterAvailable: isNativePrinterAvailable(),
     };
   });
 }
