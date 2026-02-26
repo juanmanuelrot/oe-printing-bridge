@@ -43,7 +43,7 @@ export class BridgeTray {
     this.port = port;
   }
 
-  start(): void {
+  async start(): Promise<void> {
     this.tray = new SysTray({
       menu: {
         icon: this.getIcon(),
@@ -67,7 +67,10 @@ export class BridgeTray {
       copyDir: true,
     });
 
-    void this.tray.onClick((action: ClickEvent) => {
+    // Wait for the native tray binary to spawn before interacting
+    await this.tray.ready();
+
+    await this.tray.onClick((action: ClickEvent) => {
       if (action.item.title === 'Quit') {
         this.onQuit();
       }
