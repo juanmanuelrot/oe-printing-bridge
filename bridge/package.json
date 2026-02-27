@@ -13,9 +13,7 @@
   },
   "pkg": {
     "assets": [
-      "node_modules/systray2/traybin/**/*",
-      "node_modules/@thiagoelg/node-printer/prebuilds/**/*",
-      "node_modules/@thiagoelg/node-printer/build/**/*"
+      "node_modules/systray2/traybin/**/*"
     ],
     "outputPath": "build"
   },
