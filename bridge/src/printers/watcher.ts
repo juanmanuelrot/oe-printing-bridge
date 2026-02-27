@@ -14,8 +14,8 @@ export class PrinterWatcher extends EventEmitter {
   }
 
   start(): void {
-    this.poll();
-    this.timer = setInterval(() => this.poll(), POLL_INTERVAL_MS);
+    void this.poll();
+    this.timer = setInterval(() => void this.poll(), POLL_INTERVAL_MS);
   }
 
   stop(): void {
@@ -25,29 +25,33 @@ export class PrinterWatcher extends EventEmitter {
     }
   }
 
-  poll(): void {
+  async poll(): Promise<void> {
     const printers = this.configManager.getPrinters();
 
     for (const printer of printers) {
       if (!printer.enabled) continue;
 
-      const status = getPrinterStatus(printer.address);
-      const prevStatus = this.lastStatuses.get(printer.id);
+      try {
+        const status = await getPrinterStatus(printer.address);
+        const prevStatus = this.lastStatuses.get(printer.id);
 
-      if (prevStatus !== status) {
-        this.lastStatuses.set(printer.id, status);
+        if (prevStatus !== status) {
+          this.lastStatuses.set(printer.id, status);
 
-        if (status === 'missing') {
-          this.emit('printer:missing', {
+          if (status === 'missing') {
+            this.emit('printer:missing', {
+              printerId: printer.id,
+              printerName: printer.address,
+            });
+          }
+
+          this.emit('printer:status', {
             printerId: printer.id,
-            printerName: printer.address,
+            status,
           });
         }
-
-        this.emit('printer:status', {
-          printerId: printer.id,
-          status,
-        });
+      } catch (err) {
+        console.warn(`Failed to poll status for printer "${printer.id}":`, err);
       }
     }
   }
