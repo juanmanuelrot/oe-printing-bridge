@@ -13,9 +13,7 @@
   },
   "pkg": {
     "assets": [
-      "node_modules/systray2/traybin/**/*",
-      "node_modules/@thiagoelg/node-printer/prebuilds/**/*",
-      "node_modules/@thiagoelg/node-printer/build/**/*"
+      "node_modules/systray2/traybin/**/*"
     ],
     "outputPath": "build"
   },
@@ -23,7 +21,6 @@
     "fastify": "^5.2.1",
     "@fastify/cors": "^11.0.0",
     "@fastify/websocket": "^11.0.1",
-    "@thiagoelg/node-printer": "^0.5.3",
     "env-paths": "^3.0.0",
     "nanoid": "^5.0.9",
     "systray2": "^2.1.4"
