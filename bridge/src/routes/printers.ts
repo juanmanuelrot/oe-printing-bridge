@@ -5,7 +5,7 @@ export async function printerRoutes(app: FastifyInstance): Promise<void> {
   // List all Windows-installed printers with their status
   app.get('/printers/available', async () => {
     const configured = app.configManager.getPrinters();
-    return discoverPrinters(configured);
+    return await discoverPrinters(configured);
   });
 
   // List configured printers with live status

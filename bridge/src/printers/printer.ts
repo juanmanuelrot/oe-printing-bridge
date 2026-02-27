@@ -1,13 +1,5 @@
-import nodePrinter from '@thiagoelg/node-printer';
+import { printRaw as psPrintRaw } from './powershell.js';
 
-export function printRaw(printerName: string, data: Buffer): Promise<number> {
-  return new Promise((resolve, reject) => {
-    nodePrinter.printDirect({
-      data,
-      printer: printerName,
-      type: 'RAW',
-      success: (jobId: number) => resolve(jobId),
-      error: (err: Error) => reject(err),
-    });
-  });
+export async function printRaw(printerName: string, data: Buffer): Promise<void> {
+  await psPrintRaw(printerName, data);
 }
