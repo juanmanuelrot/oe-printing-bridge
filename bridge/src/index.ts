@@ -44,9 +44,10 @@ async function main(): Promise<void> {
       tray = new BridgeTray(PORT, printerWatcher, configManager, () => {
         void shutdown();
       });
-      tray.start();
+      await tray.start();
     } catch (err) {
       console.warn('System tray not available, running headless:', err);
+      tray = null;
     }
   }
 

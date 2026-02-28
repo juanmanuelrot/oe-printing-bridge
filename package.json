@@ -1,10 +1,14 @@
 {
   "name": "printer-bridge-monorepo",
   "private": true,
+  "license": "MIT",
   "workspaces": [
     "bridge",
     "client",
     "react-lib",
     "example"
-  ]
+  ],
+  "scripts": {
+    "build:installer": "npm run build:installer -w bridge"
+  }
 }
