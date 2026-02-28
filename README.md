@@ -76,3 +76,7 @@ The bridge stores its config file using OS-standard paths:
 |----------|---------|-------------|
 | `BRIDGE_PORT` | `9120` | Port for the bridge server |
 | `NO_TRAY` | — | Set to `1` to disable the system tray icon |
+
+---
+
+> **Note:** Please keep this README up to date when adding or changing endpoints, environment variables, configuration options, or package structure.
