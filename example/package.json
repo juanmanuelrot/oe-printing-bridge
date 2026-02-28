@@ -1,5 +1,5 @@
 {
-  "name": "@printer-bridge/example",
+  "name": "@ordereat-uy/printer-bridge-example",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -8,8 +8,8 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "@printer-bridge/client": "1.0.0",
-    "@printer-bridge/react": "1.0.0",
+    "@ordereat-uy/printer-bridge-client": "1.0.0",
+    "@ordereat-uy/printer-bridge-react": "1.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

@@ -1,5 +1,5 @@
 {
-  "name": "@printer-bridge/client",
+  "name": "@ordereat-uy/printer-bridge-client",
   "version": "1.0.0",
   "type": "module",
   "files": ["dist"],

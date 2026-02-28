@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BridgeProvider } from '@printer-bridge/react';
+import { BridgeProvider } from '@ordereat-uy/printer-bridge-react';
 import { App } from './App.js';
 
 createRoot(document.getElementById('root')!).render(

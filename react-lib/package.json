@@ -1,5 +1,5 @@
 {
-  "name": "@printer-bridge/react",
+  "name": "@ordereat-uy/printer-bridge-react",
   "version": "1.0.0",
   "type": "module",
   "files": ["dist"],
@@ -16,7 +16,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@printer-bridge/client": "1.0.0"
+    "@ordereat-uy/printer-bridge-client": "1.0.0"
   },
   "peerDependencies": {
     "react": ">=17"

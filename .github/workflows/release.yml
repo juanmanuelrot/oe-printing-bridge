@@ -77,12 +77,12 @@ jobs:
       - name: Build libraries
         run: npm run build -w client -w react-lib
 
-      - name: Publish @printer-bridge/client
+      - name: Publish @ordereat-uy/printer-bridge-client
         run: npm publish -w client --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @printer-bridge/react
+      - name: Publish @ordereat-uy/printer-bridge-react
         run: npm publish -w react-lib --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

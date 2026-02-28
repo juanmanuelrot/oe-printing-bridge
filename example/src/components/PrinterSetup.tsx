@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { usePrinters } from '@printer-bridge/react';
+import { usePrinters } from '@ordereat-uy/printer-bridge-react';
 
 export function PrinterSetup() {
   const { available, addPrinter } = usePrinters();

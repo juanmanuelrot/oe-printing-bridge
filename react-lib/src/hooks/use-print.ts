@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useBridgeContext } from '../context.js';
-import type { PrintJob, PrintResponse, WsEvent } from '@printer-bridge/client';
+import type { PrintJob, PrintResponse, WsEvent } from '@ordereat-uy/printer-bridge-client';
 
 export interface UsePrintReturn {
   print: (printerKey: string, data: Uint8Array | ArrayBuffer) => Promise<PrintResponse>;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useBridgeContext } from '../context.js';
-import type { AvailablePrinter, PrinterConfig, WsEvent } from '@printer-bridge/client';
+import type { AvailablePrinter, PrinterConfig, WsEvent } from '@ordereat-uy/printer-bridge-client';
 
 export interface UsePrintersReturn {
   available: AvailablePrinter[];
