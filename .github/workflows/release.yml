@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-bridge:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            pkg-target: node20-win-x64
+            artifact-name: printer-bridge-windows-x64.exe
+          - os: windows-latest
+            pkg-target: node20-win-x86
+            artifact-name: printer-bridge-windows-x86.exe
+          - os: macos-latest
+            pkg-target: node20-macos-x64
+            artifact-name: printer-bridge-macos-x64
+          - os: ubuntu-latest
+            pkg-target: node20-linux-x64
+            artifact-name: printer-bridge-linux-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Build bridge
+        run: npm run build -w bridge
+
+      - name: Package executable
+        run: npx @yao-pkg/pkg bridge/dist/index.js -t ${{ matrix.pkg-target }} -o ${{ matrix.artifact-name }} --compress GZip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-name }}
+
+  create-release:
+    needs: build-bridge
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/*
+
+  publish-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      - name: Build libraries
+        run: npm run build -w client -w react-lib
+
+      - name: Publish @printer-bridge/client
+        run: npm publish -w client --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @printer-bridge/react
+        run: npm publish -w react-lib --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
