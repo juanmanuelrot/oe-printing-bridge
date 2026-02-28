@@ -1,5 +1,5 @@
 import { useBridgeContext } from '../context.js';
-import type { PrintBridgeClient, BridgeConnectionStatus } from '@printer-bridge/client';
+import type { PrintBridgeClient, BridgeConnectionStatus } from '@ordereat-uy/printer-bridge-client';
 
 export interface UseBridgeReturn {
   status: BridgeConnectionStatus;

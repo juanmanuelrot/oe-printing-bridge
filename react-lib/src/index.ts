@@ -15,4 +15,4 @@ export type {
   PrintJob,
   PrintResponse,
   WsEvent,
-} from '@printer-bridge/client';
+} from '@ordereat-uy/printer-bridge-client';

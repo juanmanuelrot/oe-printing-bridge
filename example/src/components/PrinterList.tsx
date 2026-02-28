@@ -1,4 +1,4 @@
-import { usePrinters } from '@printer-bridge/react';
+import { usePrinters } from '@ordereat-uy/printer-bridge-react';
 
 const statusColors: Record<string, string> = {
   idle: '#22c55e',

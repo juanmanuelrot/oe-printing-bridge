@@ -1,4 +1,4 @@
-import { useBridge } from '@printer-bridge/react';
+import { useBridge } from '@ordereat-uy/printer-bridge-react';
 
 export function BridgeStatus() {
   const { status, isReady } = useBridge();

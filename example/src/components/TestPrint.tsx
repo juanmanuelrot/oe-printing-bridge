@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { usePrint, usePrinters, useBridge } from '@printer-bridge/react';
+import { usePrint, usePrinters, useBridge } from '@ordereat-uy/printer-bridge-react';
 import { buildTestReceipt } from '../utils/test-receipt.js';
 
 export function TestPrint() {

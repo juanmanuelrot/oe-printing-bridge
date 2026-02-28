@@ -12,7 +12,7 @@ import {
   type BridgeClientOptions,
   type BridgeConnectionStatus,
   type WsEvent,
-} from '@printer-bridge/client';
+} from '@ordereat-uy/printer-bridge-client';
 
 interface BridgeContextValue {
   client: PrintBridgeClient;
