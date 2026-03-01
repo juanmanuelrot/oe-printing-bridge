@@ -36,7 +36,7 @@ jobs:
         run: npm run build -w bridge
 
       - name: Package executable
-        run: npx @yao-pkg/pkg bridge/dist/index.js -t ${{ matrix.pkg-target }} -o ${{ matrix.artifact-name }} --compress GZip
+        run: npx @yao-pkg/pkg bridge/package.json -t ${{ matrix.pkg-target }} -o ${{ matrix.artifact-name }} --compress GZip
 
       - uses: actions/upload-artifact@v4
         with:

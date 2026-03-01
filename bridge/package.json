@@ -14,7 +14,7 @@
   },
   "pkg": {
     "assets": [
-      "node_modules/systray2/traybin/**/*"
+      "../node_modules/systray2/traybin/**/*"
     ],
     "outputPath": "build"
   },
