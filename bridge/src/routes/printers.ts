@@ -1,6 +1,17 @@
 import type { FastifyInstance } from 'fastify';
 import { discoverPrinters } from '../printers/discovery.js';
 
+/**
+ * Validate that a printer address/name is safe.
+ * Rejects strings containing characters that could be used for script injection.
+ */
+function isValidPrinterAddress(address: string): boolean {
+  // Allow letters, digits, spaces, hyphens, underscores, dots, parens,
+  // hash, backslash (UNC paths), forward slash, and colon (port addresses).
+  // Block anything else (backticks, semicolons, pipes, $, quotes, braces, etc.)
+  return /^[\w\s.\-#()\\/:,]+$/.test(address) && address.length <= 255;
+}
+
 export async function printerRoutes(app: FastifyInstance): Promise<void> {
   // List all Windows-installed printers with their status
   app.get('/printers/available', async () => {
@@ -31,6 +42,12 @@ export async function printerRoutes(app: FastifyInstance): Promise<void> {
     },
   }, async (request, reply) => {
     const { id, name, address, enabled = true } = request.body;
+
+    if (!isValidPrinterAddress(address)) {
+      reply.code(400);
+      return { error: 'Printer address contains invalid characters' };
+    }
+
     const printer = app.configManager.addPrinter({ id, name, address, enabled });
     // Trigger an immediate status poll for the new printer
     app.printerWatcher.poll();
