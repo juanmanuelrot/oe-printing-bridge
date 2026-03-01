@@ -1,4 +1,5 @@
 import { ConfigManager } from './config/config-manager.js';
+import { CloudConnector } from './cloud/cloud-connector.js';
 import { PrintQueue } from './print/print-queue.js';
 import { PrinterWatcher } from './printers/watcher.js';
 import { createServer } from './server.js';
@@ -28,9 +29,11 @@ async function main(): Promise<void> {
   // Create HTTP + WS server
   const server = await createServer({ configManager, printQueue, printerWatcher });
 
-  // Graceful shutdown
+  // Graceful shutdown (cloudConnector is assigned later if cloud is configured)
+  let cloudConnector: CloudConnector | null = null;
   const shutdown = async () => {
     console.log('Shutting down...');
+    if (cloudConnector) cloudConnector.disconnect();
     printerWatcher.stop();
     await configManager.destroy();
     await server.close();
@@ -78,6 +81,14 @@ async function main(): Promise<void> {
     if (printers.length === 0) {
       tray.setStatus('warning');
     }
+  }
+
+  // Connect to cloud if configured
+  const cloudConfig = configManager.getCloudConfig();
+  if (cloudConfig) {
+    cloudConnector = new CloudConnector(cloudConfig, configManager, printQueue, printerWatcher);
+    cloudConnector.connect();
+    console.log('Cloud mode enabled, connecting to', cloudConfig.serverUrl);
   }
 
   // Handle process signals

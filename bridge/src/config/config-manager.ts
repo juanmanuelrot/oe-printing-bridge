@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import envPaths from 'env-paths';
-import type { BridgeConfig, PrinterConfig } from '../types.js';
+import type { BridgeConfig, CloudConfig, PrinterConfig } from '../types.js';
 import { DEFAULT_CONFIG } from '../types.js';
 
 const paths = envPaths('printer-bridge', { suffix: '' });
@@ -62,6 +62,15 @@ export class ConfigManager {
     Object.assign(printer, updates);
     this.scheduleSave();
     return printer;
+  }
+
+  getCloudConfig(): CloudConfig | undefined {
+    return this.config.cloud;
+  }
+
+  setCloudConfig(cloud: CloudConfig): void {
+    this.config.cloud = cloud;
+    this.scheduleSave();
   }
 
   removePrinter(id: string): boolean {

@@ -6,7 +6,8 @@
     "bridge",
     "client",
     "react-lib",
-    "example"
+    "example",
+    "cloud"
   ],
   "scripts": {
     "build:installer": "npm run build:installer -w bridge"
