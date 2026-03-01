@@ -14,7 +14,7 @@ jobs:
             pkg-target: node20-win-x64
             artifact-name: printer-bridge-windows-x64.exe
           - os: windows-latest
-            pkg-target: node20-win-x86
+            pkg-target: node18-win-x86
             artifact-name: printer-bridge-windows-x86.exe
           - os: macos-latest
             pkg-target: node20-macos-x64
@@ -34,6 +34,13 @@ jobs:
 
       - name: Build bridge
         run: npm run build -w bridge
+
+      - name: Remove Strawberry Perl from PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $paths = $env:PATH -split ';' | Where-Object { $_ -notmatch 'Strawberry' }
+          "PATH=$($paths -join ';')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Package executable
         run: npx @yao-pkg/pkg bridge/package.json -t ${{ matrix.pkg-target }} -o ${{ matrix.artifact-name }} --compress GZip
