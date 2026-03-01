@@ -2,6 +2,10 @@
   "name": "@ordereat-uy/printer-bridge-react",
   "version": "1.0.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juanmanuelrot/oe-printing-bridge"
+  },
   "type": "module",
   "files": ["dist"],
   "main": "dist/index.js",
