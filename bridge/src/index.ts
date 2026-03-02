@@ -3,11 +3,13 @@ import { PrintQueue } from './print/print-queue.js';
 import { PrinterWatcher } from './printers/watcher.js';
 import { createServer } from './server.js';
 import { BridgeTray } from './tray.js';
+import { setupFileLogging } from './logger.js';
 
 const PORT = parseInt(process.env.BRIDGE_PORT ?? '9120', 10);
 const ENABLE_TRAY = process.env.NO_TRAY !== '1';
 
 async function main(): Promise<void> {
+  const logPath = setupFileLogging();
   console.log('Starting Printer Bridge...');
 
   // Initialize config
@@ -41,7 +43,7 @@ async function main(): Promise<void> {
   let tray: BridgeTray | null = null;
   if (ENABLE_TRAY) {
     try {
-      tray = new BridgeTray(PORT, printerWatcher, configManager, () => {
+      tray = new BridgeTray(PORT, printerWatcher, configManager, logPath, () => {
         void shutdown();
       });
       await tray.start();
