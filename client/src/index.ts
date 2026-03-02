@@ -1,4 +1,11 @@
 export { PrintBridgeClient } from './client.js';
+export { CloudPrintClient } from './cloud-client.js';
+export type {
+  CloudPrintClientOptions,
+  CloudPrintJob,
+  CloudPrintResponse,
+  CloudPrinter,
+} from './cloud-client.js';
 export type {
   AvailablePrinter,
   BridgeClientOptions,

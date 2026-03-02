@@ -28,10 +28,16 @@ export interface PrintJob {
   completedAt?: string;
 }
 
+export interface CloudConfig {
+  serverUrl: string;
+  bridgeToken: string;
+}
+
 export interface BridgeConfig {
   version: number;
   printers: PrinterConfig[];
   settings: BridgeSettings;
+  cloud?: CloudConfig;
 }
 
 export interface BridgeSettings {

@@ -4,12 +4,12 @@ import { join } from 'node:path';
 import { writeFile, unlink } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 
-function runPowerShell(script: string): Promise<string> {
+function runPowerShell(script: string, envVars?: Record<string, string>): Promise<string> {
   return new Promise((resolve, reject) => {
     execFile(
       'powershell.exe',
       ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', script],
-      { timeout: 10_000 },
+      { timeout: 10_000, env: { ...process.env, ...envVars } },
       (err, stdout, stderr) => {
         if (err) {
           reject(new Error(stderr.trim() || err.message));
@@ -54,12 +54,12 @@ export async function getPrinters(): Promise<WinPrinter[]> {
  * Get the status of a single printer by name.
  */
 export async function getPrinterStatus(printerName: string): Promise<string> {
-  const escaped = printerName.replace(/'/g, "''");
+  // Pass printer name via environment variable to prevent PowerShell injection
   const script = `
-    $p = Get-Printer -Name '${escaped}' -ErrorAction SilentlyContinue
+    $p = Get-Printer -Name $env:PB_PRINTER_NAME -ErrorAction SilentlyContinue
     if ($p) { $p.PrinterStatus.ToString() } else { 'NOT_FOUND' }
   `;
-  return runPowerShell(script);
+  return runPowerShell(script, { PB_PRINTER_NAME: printerName });
 }
 
 /**
@@ -71,9 +71,7 @@ export async function printRaw(printerName: string, data: Buffer): Promise<void>
   const tmpFile = join(tmpdir(), `pb-${randomBytes(8).toString('hex')}.bin`);
   await writeFile(tmpFile, data);
 
-  const escapedPrinter = printerName.replace(/'/g, "''");
-  const escapedPath = tmpFile.replace(/'/g, "''");
-
+  // Pass printer name and file path via environment variables to prevent PowerShell injection
   const script = `
 Add-Type -TypeDefinition @'
 using System;
@@ -145,16 +143,16 @@ public class RawPrinterHelper {
 }
 '@
 
-$bytes = [System.IO.File]::ReadAllBytes('${escapedPath}')
-$result = [RawPrinterHelper]::SendBytesToPrinter('${escapedPrinter}', $bytes)
+$bytes = [System.IO.File]::ReadAllBytes($env:PB_FILE_PATH)
+$result = [RawPrinterHelper]::SendBytesToPrinter($env:PB_PRINTER_NAME, $bytes)
 if (-not $result) {
-    throw "Failed to send data to printer '${escapedPrinter}'"
+    throw ("Failed to send data to printer: " + $env:PB_PRINTER_NAME)
 }
 Write-Output 'OK'
 `;
 
   try {
-    await runPowerShell(script);
+    await runPowerShell(script, { PB_PRINTER_NAME: printerName, PB_FILE_PATH: tmpFile });
   } finally {
     // Clean up temp file
     await unlink(tmpFile).catch(() => {});
