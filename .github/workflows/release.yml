@@ -155,6 +155,12 @@ jobs:
 
       - run: npm ci
 
+      - name: Set version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          npm pkg set version=$VERSION -w client -w react-lib
+          npm pkg set dependencies.@ordereat-uy/printer-bridge-client=$VERSION -w react-lib
+
       - name: Build libraries
         run: npm run build -w client -w react-lib
 
