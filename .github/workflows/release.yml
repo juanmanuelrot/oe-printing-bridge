@@ -67,8 +67,65 @@ jobs:
           name: printer-bridge-windows-x64-setup.exe
           path: printer-bridge-windows-x64-setup.exe
 
+  # x86 uses a bundled 32-bit Node.js binary instead of pkg (which has
+  # no prebuilt x86 binary and fails to compile Node from source in CI).
+  build-bridge-x86:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Build bridge
+        run: npm run build -w bridge
+
+      - name: Prepare x86 staging directory
+        shell: pwsh
+        run: |
+          $stage = "bridge/build-x86"
+          New-Item -ItemType Directory -Path "$stage/dist" -Force | Out-Null
+
+          # Copy compiled JS output and package.json
+          Copy-Item "bridge/dist/*" "$stage/dist/" -Recurse
+          Copy-Item "bridge/package.json" "$stage/"
+
+          # Install production-only dependencies in the standalone directory
+          Push-Location $stage
+          npm install --omit=dev
+          Pop-Location
+
+      - name: Download 32-bit Node.js
+        shell: pwsh
+        run: |
+          $nodeVer = node --version
+          $url = "https://nodejs.org/dist/$nodeVer/node-$nodeVer-win-x86.zip"
+          Write-Host "Downloading Node.js $nodeVer (x86) from $url"
+          Invoke-WebRequest -Uri $url -OutFile node-x86.zip
+          Expand-Archive node-x86.zip -DestinationPath node-x86-tmp
+          $extracted = Get-ChildItem node-x86-tmp -Directory | Select-Object -First 1
+          Copy-Item "$($extracted.FullName)/node.exe" "bridge/build-x86/node.exe"
+
+      - name: Build x86 installer
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion="$version" bridge/installer-x86.iss
+          Copy-Item "bridge/build/PrinterBridgeSetup-x86.exe" "printer-bridge-windows-x86-setup.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: printer-bridge-windows-x86-setup.exe
+          path: printer-bridge-windows-x86-setup.exe
+
   create-release:
-    needs: build-bridge
+    needs: [build-bridge, build-bridge-x86]
+    # Run even if x86 failed, as long as the main builds succeeded
+    if: always() && needs.build-bridge.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
