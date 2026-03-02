@@ -1,13 +1,17 @@
-; Inno Setup Script for Printer Bridge
+; Inno Setup Script for Printer Bridge (x86 / 32-bit Windows)
+; Bundles a 32-bit Node.js runtime with the application files.
 ; Requires Inno Setup 6+ (https://jrsoftware.org/isinfo.php)
 
 #ifndef MyAppVersion
   #define MyAppVersion "1.0.0"
 #endif
 
+#ifndef StagingDir
+  #define StagingDir "build-x86"
+#endif
+
 #define MyAppName "Printer Bridge"
 #define MyAppPublisher "OrderEat"
-#define MyAppExeName "printer-bridge.exe"
 #define MyAppURL "https://github.com/juanmanuelrot/oe-printing-bridge"
 
 [Setup]
@@ -18,9 +22,8 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-UninstallDisplayIcon={app}\{#MyAppExeName}
 OutputDir=build
-OutputBaseFilename=PrinterBridgeSetup
+OutputBaseFilename=PrinterBridgeSetup-x86
 Compression=lzma2
 SolidCompression=yes
 PrivilegesRequired=lowest
@@ -31,38 +34,38 @@ CloseApplications=force
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "build\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StagingDir}\node.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StagingDir}\package.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StagingDir}\dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\node_modules\*"; DestDir: "{app}\node_modules"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\node.exe"; Parameters: "dist\index.js"; WorkingDir: "{app}"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 
 [Run]
-; Launch after install
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; \
-  Flags: nowait postinstall skipifsilent
-
-[UninstallRun]
-; Kill running instance before uninstall
-Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}"; \
-  Flags: runhidden; RunOnceId: "KillApp"
+Filename: "{app}\node.exe"; Parameters: "dist\index.js"; WorkingDir: "{app}"; \
+  Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 const
   TaskName = 'PrinterBridge';
 
 { Creates a Windows Scheduled Task that auto-starts on logon and
-  restarts the exe automatically after a crash (up to 10 times,
-  with a 30-second delay between attempts). No admin rights required. }
-procedure CreateScheduledTask(AppPath: string);
+  restarts the app automatically after a crash (up to 10 times,
+  with a 30-second delay between attempts). }
+procedure CreateScheduledTask;
 var
-  TmpPs1, Script: string;
+  TmpPs1, Script, AppDir, NodePath: string;
   ResultCode: Integer;
 begin
-  TmpPs1 := ExpandConstant('{tmp}\create-bridge-task.ps1');
+  AppDir   := ExpandConstant('{app}');
+  NodePath := AppDir + '\node.exe';
+  TmpPs1   := ExpandConstant('{tmp}\create-bridge-task.ps1');
 
   Script :=
-    '$appPath  = ''' + AppPath + '''' + #13#10 +
+    '$nodePath = ''' + NodePath + '''' + #13#10 +
+    '$appDir   = ''' + AppDir + '''' + #13#10 +
     '$taskName = ''' + TaskName + '''' + #13#10 +
     '$userId   = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name' + #13#10 +
     '$xml = @"' + #13#10 +
@@ -88,7 +91,11 @@ begin
     '    </RestartOnFailure>' + #13#10 +
     '  </Settings>' + #13#10 +
     '  <Actions Context="Author">' + #13#10 +
-    '    <Exec><Command>$appPath</Command></Exec>' + #13#10 +
+    '    <Exec>' + #13#10 +
+    '      <Command>$nodePath</Command>' + #13#10 +
+    '      <Arguments>dist\index.js</Arguments>' + #13#10 +
+    '      <WorkingDirectory>$appDir</WorkingDirectory>' + #13#10 +
+    '    </Exec>' + #13#10 +
     '  </Actions>' + #13#10 +
     '</Task>' + #13#10 +
     '"@' + #13#10 +
@@ -124,7 +131,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
-    CreateScheduledTask(ExpandConstant('{app}\{#MyAppExeName}'));
+    CreateScheduledTask;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
