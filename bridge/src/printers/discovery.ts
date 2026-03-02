@@ -1,5 +1,5 @@
 import type { AvailablePrinter, PrinterConfig, PrinterStatus } from '../types.js';
-import { getPrinters } from './powershell.js';
+import { getPrinters, getPrinterStatus as getPrinterStatusWin } from './powershell.js';
 
 export function mapPrinterStatus(rawStatus: string): PrinterStatus {
   const s = rawStatus?.toUpperCase() ?? '';
@@ -26,8 +26,7 @@ export async function discoverPrinters(configuredPrinters: PrinterConfig[]): Pro
 }
 
 export async function getPrinterStatus(printerName: string): Promise<PrinterStatus> {
-  const { getPrinterStatus: getStatus } = await import('./powershell.js');
-  const status = await getStatus(printerName);
+  const status = await getPrinterStatusWin(printerName);
   if (status === 'NOT_FOUND') return 'missing';
   return mapPrinterStatus(status);
 }

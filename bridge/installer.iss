@@ -32,15 +32,16 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "build\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "launcher.vbs";           DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 
 [Run]
-; Launch after install
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; \
-  Flags: nowait postinstall skipifsilent
+; Launch after install (via wscript so no console window appears)
+Filename: "wscript.exe"; Parameters: """{app}\launcher.vbs"""; \
+  Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 ; Kill running instance before uninstall
@@ -54,7 +55,7 @@ const
 { Creates a Windows Scheduled Task that auto-starts on logon and
   restarts the exe automatically after a crash (up to 10 times,
   with a 30-second delay between attempts). No admin rights required. }
-procedure CreateScheduledTask(AppPath: string);
+procedure CreateScheduledTask(AppPath: string; LauncherPath: string);
 var
   TmpPs1, Script: string;
   ResultCode: Integer;
@@ -62,7 +63,8 @@ begin
   TmpPs1 := ExpandConstant('{tmp}\create-bridge-task.ps1');
 
   Script :=
-    '$appPath  = ''' + AppPath + '''' + #13#10 +
+    '$appPath      = ''' + AppPath + '''' + #13#10 +
+    '$launcherPath = ''' + LauncherPath + '''' + #13#10 +
     '$taskName = ''' + TaskName + '''' + #13#10 +
     '$userId   = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name' + #13#10 +
     '$xml = @"' + #13#10 +
@@ -88,7 +90,7 @@ begin
     '    </RestartOnFailure>' + #13#10 +
     '  </Settings>' + #13#10 +
     '  <Actions Context="Author">' + #13#10 +
-    '    <Exec><Command>$appPath</Command></Exec>' + #13#10 +
+    '    <Exec><Command>wscript.exe</Command><Arguments>"$launcherPath"</Arguments></Exec>' + #13#10 +
     '  </Actions>' + #13#10 +
     '</Task>' + #13#10 +
     '"@' + #13#10 +
@@ -124,7 +126,9 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
-    CreateScheduledTask(ExpandConstant('{app}\{#MyAppExeName}'));
+    CreateScheduledTask(
+      ExpandConstant('{app}\{#MyAppExeName}'),
+      ExpandConstant('{app}\launcher.vbs'));
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
